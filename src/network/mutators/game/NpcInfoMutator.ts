@@ -11,6 +11,7 @@ export default class NpcInfoMutator extends IMMOClientMutator<
   update(packet: NpcInfo): void {
     // handle mobs and npcs?
     Vk.handleMob(packet.ObjectId, packet.Creature, this.Client.ActiveChar.Name)
+    // ---
 
     const npc = this.Client.CreaturesList.getEntryByObjectId(packet.ObjectId);
     if (!npc) {

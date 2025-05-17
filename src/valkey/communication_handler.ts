@@ -16,7 +16,7 @@ export class Vk {
 
   static charMutator (packet: any): void {
 
-    console.log(packet)
+    // console.log(packet)
   }
   
   static checkObject () {
