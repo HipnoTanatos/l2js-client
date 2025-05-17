@@ -4,7 +4,16 @@ import CharInfo from '../network/incoming/game/CharInfo'
 import L2Mob from '../entities/L2Mob'
 import L2Creature from '../entities/L2Creature'
 
+const client = new Valkey()
+
+
 export class Vk {
+  activeCharacter: string
+
+  constructor (session: any) {
+    this.activeCharacter = session
+  }
+
   static charMutator (packet: any): void {
 
     console.log(packet)
@@ -14,17 +23,14 @@ export class Vk {
 
   }
 
-  static publish (id: number, hash: {}) {
-    // send message
-    // send hash
-  }
 
 
   handleNPC (NPC) {
 
   }
 
-  static handleMob (objId: number, mob: L2Creature) {
+  static handleMob (objId: number, mob: L2Creature, activeCharacter: string) {
+    const entityType = mob.IsAttackable ? "mob" : "npc"
     const id = objId
     const hash = {
       // object attributes
@@ -52,9 +58,9 @@ export class Vk {
 
       // mob attributes
       // unimplemented?
-      is_spoiled: "",
+      is_spoiled: " ",
     }
-    Vk.publish(id, hash)
+    Vk.publish(id, hash, entityType, activeCharacter)
   }
 
   handleCharacter (character) {
@@ -69,6 +75,12 @@ export class Vk {
 
   }
 
+  static publish (id: number, hash: {}, type: string, character: string) {
+    const hId = `${type}:${id}:${character}`
+
+    client.publish('environment', `new:${hId}`)
+    client.hset(hId, hash)
+  }
 }
 
 
