@@ -25,7 +25,7 @@ export class Vk {
 
 
 
-  handleNPC (NPC) {
+  handleNPC (NPC: any) {
 
   }
 
@@ -63,15 +63,15 @@ export class Vk {
     Vk.publish(id, hash, entityType, activeCharacter)
   }
 
-  handleCharacter (character) {
+  handleCharacter (character: any) {
 
   }
 
-  handleUser (character) {
+  handleUser (character: any) {
 
   }
 
-  handlePartyMember (character) {
+  handlePartyMember (character: any) {
 
   }
 
