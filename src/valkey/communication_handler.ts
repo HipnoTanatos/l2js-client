@@ -4,6 +4,7 @@ import CharInfo from '../network/incoming/game/CharInfo'
 import L2Mob from '../entities/L2Mob'
 import L2Creature from '../entities/L2Creature'
 import L2Character from '../entities/L2Character'
+import L2User from '../entities/L2User'
 
 const client = new Valkey()
 
@@ -83,8 +84,37 @@ export class Vk {
     Vk.publish(id, hash, 'character', activeCharacter)
   }
 
-  handleUser (character: any) {
+  static handleUser (objId: number, char: L2User, activeCharacter: string) {
+    const id = objId
+    const hash = {
+      // object attributes
+      id: char.Id,
+      object_id: char.ObjectId,
+      name: char.Name,
 
+      pos_x: char.X,
+      pos_y: char.Y,
+      pos_z: char.Z,
+      pos_distance: char.Distance,
+
+      // entitie attributes
+      hp: char.Hp,
+      mp: char.Mp,
+      cp: char.Cp,
+      max_hp: char.MaxHp,
+      max_mp: char.MaxMp,
+      max_cp: char.MaxCp,
+      level: char.Level,
+
+      is_dead: char.IsDead,
+      is_attackable: char.IsAttackable,
+      is_targetable: char.IsTargetable,
+      is_party_member: char.IsPartyMember,
+
+      class_id: char.ClassId,
+      class_name: char.ClassName,
+    }
+    Vk.publish(id, hash, 'me', activeCharacter)
   }
 
   handlePartyMember (character: any) {
