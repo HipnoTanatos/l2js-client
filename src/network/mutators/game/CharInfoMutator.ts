@@ -1,15 +1,20 @@
 import IMMOClientMutator from "../../../mmocore/IMMOClientMutator";
 import GameClient from "../../GameClient";
 import CharInfo from "../../incoming/game/CharInfo";
+import { Vk } from "../../../valkey/communication_handler"
 
 export default class CharInfoMutator extends IMMOClientMutator<
   GameClient,
   CharInfo
 > {
   update(packet: CharInfo): void {
+    Vk.handleCharacter(packet.Char.ObjectId, packet.Char, this.Client.ActiveChar.Name)
+    // ---
+
     const char = this.Client.CreaturesList.getEntryByObjectId(
       packet.Char.ObjectId
     );
+
     if (!char) {
       packet.Char.calculateDistance(this.Client.ActiveChar);
       this.Client.CreaturesList.add(packet.Char);
