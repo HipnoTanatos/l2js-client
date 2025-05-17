@@ -114,12 +114,19 @@ export class Vk {
       class_id: char.ClassId,
       class_name: char.ClassName,
     }
-    Vk.publish(id, hash, 'me', activeCharacter)
+    // Vk.publish(id, hash, 'me', activeCharacter)
   }
 
   handlePartyMember (character: any) {
 
   }
+
+  static handleChat (message: ChatMessage) {
+    client.publish('chat', message.objectId.toString())
+    client.hset(message.objectId.toString(), message)
+    client.expire(message.objectId.toString(), 30 * 60)
+  }
+
 
   static publish (id: number, hash: {}, type: string, character: string) {
     const hId = `${type}:${id}:${character}`
@@ -130,3 +137,10 @@ export class Vk {
 }
 
 
+interface ChatMessage {
+  objectId: number;
+  type: number;
+  charName: string;
+  npcStringId: number;
+  messages: string[];
+}
