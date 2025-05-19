@@ -1,7 +1,5 @@
 import Valkey from 'iovalkey'
-import CharInfo from '../network/incoming/game/CharInfo'
 
-import L2Mob from '../entities/L2Mob'
 import L2Creature from '../entities/L2Creature'
 import L2Character from '../entities/L2Character'
 import L2User from '../entities/L2User'
