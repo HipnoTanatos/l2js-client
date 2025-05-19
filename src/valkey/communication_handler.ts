@@ -5,8 +5,6 @@ import L2Character from '../entities/L2Character'
 import L2User from '../entities/L2User'
 import Client from '../Client'
 
-const client = new Valkey()
-
 
 export class Vk {
   static  client: Valkey | null = null;
@@ -141,7 +139,7 @@ export class Vk {
 }
 
 
-class ValkeyClient {
+export class ValkeyClient {
   vk: Valkey
   l2Clients: Client[]
 
@@ -149,12 +147,12 @@ class ValkeyClient {
     this.vk = new Valkey(6379, "127.0.0.1")
     this.l2Clients = [l2Client]
 
-    client.subscribe('commands')
+    this.vk.subscribe('commands')
     Vk.setClient(this.vk)
   }
 
   listen () {
-    client.on('message', (channel, message) => {
+    this.vk.on('message', (channel, message) => {
       if (channel == 'commands') {
         this.handleCommand(message)
       }
