@@ -5,11 +5,18 @@ import L2Mob from '../entities/L2Mob'
 import L2Creature from '../entities/L2Creature'
 import L2Character from '../entities/L2Character'
 import L2User from '../entities/L2User'
+import Client from '../Client'
 
 const client = new Valkey()
 
 
 export class Vk {
+  static  client: Valkey | null = null;
+
+  static setClient (instance: Valkey) {
+    Vk.client = instance;
+  }
+
   static charMutator (packet: any): void {
     // console.log(packet)
   }
@@ -122,17 +129,43 @@ export class Vk {
   }
 
   static handleChat (message: ChatMessage) {
-    client.publish('chat', message.objectId.toString())
-    client.hset(message.objectId.toString(), message)
-    client.expire(message.objectId.toString(), 30 * 60)
+    Vk.client?.publish('chat', message.objectId.toString())
+    Vk.client?.hset(message.objectId.toString(), message)
+    Vk.client?.expire(message.objectId.toString(), 30 * 60)
   }
-
 
   static publish (id: number, hash: {}, type: string, character: string) {
     const hId = `${type}:${id}:${character}`
 
-    client.publish('environment', `new:${hId}`)
-    client.hset(hId, hash)
+    Vk.client?.publish('environment', `new:${hId}`)
+    Vk.client?.hset(hId, hash)
+  }
+}
+
+
+class ValkeyClient {
+  vk: Valkey
+  l2Clients: Client[]
+
+  constructor (l2Client: Client) {
+    this.vk = new Valkey(6379, "127.0.0.1")
+    this.l2Clients = [l2Client]
+
+    client.subscribe('commands')
+    Vk.setClient(this.vk)
+  }
+
+  listen () {
+    client.on('message', (channel, message) => {
+      if (channel == 'commands') {
+        this.handleCommand(message)
+      }
+      }
+    )
+  }
+
+  handleCommand (command: string) {
+    console.log(`Comando recibido en el canal "commands": `, command)
   }
 }
 
@@ -144,3 +177,4 @@ interface ChatMessage {
   npcStringId: number;
   messages: string[];
 }
+
