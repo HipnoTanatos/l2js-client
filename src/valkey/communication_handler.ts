@@ -140,19 +140,21 @@ export class Vk {
 
 
 export class ValkeyClient {
-  vk: Valkey
-  l2Clients: Client[]
+  vkListerner: Valkey
+  vkPublisher: Valkey
+  l2Clients: Client[]  
 
   constructor (l2Client: Client) {
-    this.vk = new Valkey(6379, "127.0.0.1")
+    this.vkListerner = new Valkey(6379, "127.0.0.1")
+    this.vkPublisher = new Valkey(6379, "127.0.0.1")
     this.l2Clients = [l2Client]
 
-    this.vk.subscribe('commands')
-    Vk.setClient(this.vk)
+    this.vkListerner.subscribe('commands')
+    Vk.setClient(this.vkPublisher)
   }
 
   listen () {
-    this.vk.on('message', (channel, message) => {
+    this.vkListerner.on('message', (channel, message) => {
       if (channel == 'commands') {
         this.handleCommand(message)
       }
@@ -162,6 +164,25 @@ export class ValkeyClient {
 
   handleCommand (command: string) {
     console.log(`Comando recibido en el canal "commands": `, command)
+    const [received_command, params, character] = command.split(':')
+    console.log(received_command, params, character)
+    this.l2Clients.forEach((c: Client) => {
+      if (c.Me.Name == character) {
+        if (received_command === 'say') {
+          c.say(params)
+        }
+        else if (received_command === 'whisp') {
+          let [msg, target] = params.split(',')
+          c.tell(msg, target)
+        }
+
+      }
+    })
+  }
+
+  registerCharacter (name: string) {
+    this.vkPublisher.hset('connected_accounts', {name})
+
   }
 }
 
