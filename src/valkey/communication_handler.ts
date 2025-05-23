@@ -117,7 +117,7 @@ export class Vk {
       class_id: char.ClassId,
       class_name: char.ClassName,
     }
-    // Vk.publish(id, hash, 'me', activeCharacter)
+    Vk.publish(id, hash, 'active', activeCharacter)
   }
 
   handlePartyMember (character: any) {
@@ -180,10 +180,6 @@ export class ValkeyClient {
     })
   }
 
-  registerCharacter (name: string) {
-    this.vkPublisher.hset('connected_accounts', {name})
-
-  }
 }
 
 
