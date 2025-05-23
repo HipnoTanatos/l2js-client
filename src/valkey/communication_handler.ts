@@ -51,7 +51,7 @@ export class Vk {
       // unimplemented?
       is_spoiled: " ",
     }
-    Vk.publish(id, hash, entityType, activeCharacter)
+    Vk.publishEnvironment(id, hash, entityType, activeCharacter)
   }
 
   static handleCharacter (objId: number, char: L2Character, activeCharacter: string) {
@@ -84,7 +84,7 @@ export class Vk {
       class_id: char.ClassId,
       class_name: char.ClassName,
     }
-    Vk.publish(id, hash, 'character', activeCharacter)
+    Vk.publishEnvironment(id, hash, 'character', activeCharacter)
   }
 
   static handleUser (objId: number, char: L2User, activeCharacter: string) {
@@ -117,7 +117,7 @@ export class Vk {
       class_id: char.ClassId,
       class_name: char.ClassName,
     }
-    Vk.publish(id, hash, 'active', activeCharacter)
+    Vk.publishEnvironment(id, hash, 'active', activeCharacter)
   }
 
   handlePartyMember (character: any) {
@@ -130,10 +130,10 @@ export class Vk {
     Vk.client?.expire(message.objectId.toString(), 30 * 60)
   }
 
-  static publish (id: number, hash: {}, type: string, character: string) {
-    const hId = `${type}:${id}:${character}`
+  static publishEnvironment (id: number, hash: {}, type: string, character: string) {
+    const hId = `${character}:${type}:${id}:`
 
-    Vk.client?.publish('environment', `new:${hId}`)
+    Vk.client?.publish('environment', `add:${hId}`)
     Vk.client?.hset(hId, hash)
   }
 }
@@ -175,11 +175,9 @@ export class ValkeyClient {
           let [msg, target] = params.split(',')
           c.tell(msg, target)
         }
-
       }
     })
   }
-
 }
 
 
