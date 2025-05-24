@@ -145,7 +145,7 @@ export class Vk {
     const channel = 'environment'
     const operation = 'rm'
     const [cursor, hId] = await Vk.client!.scan(0, 'MATCH', `*${character}:${objectId}`,
-                                                 'COUNT', 1000)
+                                                   'COUNT', 1000)
 
     Vk.client?.publish(channel, `${operation}:${hId[0]}`)
     Vk.client?.del(hId)
