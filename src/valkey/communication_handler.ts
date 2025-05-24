@@ -209,8 +209,44 @@ const CommandHandlers: Record<string, CommandHandler> = {
   say: (client, params) => {
     client.say(params);
   },
+
   whisp: (client, params) => {
     const [message, target] = params.split(',')
     client.tell(message, target)
+  },
+
+  hit: (client, params) => {
+    const [target, shift] = params.split(',')
+    client.hit(parseInt(target, 10),
+                  shift.toLowerCase() === 'true')
+  },
+
+  attack: (client, params) => {
+    const [target, shift] = params.split(',')
+    client.attack(parseInt(target, 10),
+                  shift.toLowerCase() === 'true')
+  },
+
+  moveTo: (client, params) => {
+    const [x, y, z] = params.split(',')
+    client.moveTo(parseInt(x, 10), parseInt(y, 10), parseInt(z, 10))
+  },
+
+  autoshots: (client, params) => {
+    const [soulshots, toggle] = params.split(',')
+    client.autoShots(parseInt(soulshots, 10),
+                     toggle.toLowerCase() === 'true')
+  },
+
+  cast: (client, params) => {
+    const [skill, force = 'false', shift = 'false'] = params.split(',')
+    client.cast(parseInt(skill, 10),
+                force.toLowerCase() === 'true',
+                shift.toLowerCase() === 'true')
+  },
+
+  sit_stand: (client, params) => {
+    client.sitOrStand()
+    // TODO: not working
   },
 }
