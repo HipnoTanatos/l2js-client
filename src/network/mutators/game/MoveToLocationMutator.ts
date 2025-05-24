@@ -14,8 +14,6 @@ export default class MoveToLocationMutator extends IMMOClientMutator<
       );
 
       if (creature) {
-        Vk.handleMob(packet.ObjectId, creature!, this.Client.ActiveChar.Name)
-        // ---
         const [_x, _y, _z] = packet.Location;
         const [_xDst, _yDst, _zDst] = packet.Destination;
         creature.setMovingTo(_x, _y, _z, _xDst, _yDst, _zDst);
@@ -24,6 +22,8 @@ export default class MoveToLocationMutator extends IMMOClientMutator<
           creature.calculateDistance(this.Client.ActiveChar);
         }
       }
+      Vk.handleMob(packet.ObjectId, creature!, this.Client.ActiveChar.Name)
+      // ---
     }
   }
 }
