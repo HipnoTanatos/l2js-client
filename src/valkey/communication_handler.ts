@@ -86,7 +86,7 @@ export class Vk {
       class_name: char.ClassName,
     }
     Vk.publishEnvironment(id, hash, 'character', activeCharacter)
-    }
+  }
 
   static handleUser (objId: number, char: L2User, activeCharacter: string) {
     const id = objId
@@ -177,20 +177,20 @@ export class ValkeyClient {
   }
 
   handleCommand (command: string) {
-    console.log(`Comando recibido en el canal "commands": `, command)
-    const [received_command, params, character] = command.split(':')
-    console.log(received_command, params, character)
-    this.l2Clients.forEach((c: Client) => {
-      if (c.Me.Name == character) {
-        if (received_command === 'say') {
-          c.say(params)
-        }
-        else if (received_command === 'whisp') {
-          let [msg, target] = params.split(',')
-          c.tell(msg, target)
-        }
+    const [character, receivedCommand, params] = command.split(':')
+    const handler = CommandHandlers[receivedCommand]
+
+    if (!handler) {
+      console.warn(`Comando no reconocido: ${receivedCommand}`)
+      return
+    }
+
+    for (const client of this.l2Clients){
+      if (client.Me.Name === character) {
+        handler(client, params)
+        break
       }
-    })
+    }
   }
 }
 
@@ -203,3 +203,14 @@ interface ChatMessage {
   messages: string[];
 }
 
+type CommandHandler = (client: Client, params: string) => void;
+
+const CommandHandlers: Record<string, CommandHandler> = {
+  say: (client, params) => {
+    client.say(params);
+  },
+  whisp: (client, params) => {
+    const [message, target] = params.split(',')
+    client.tell(message, target)
+  },
+}
