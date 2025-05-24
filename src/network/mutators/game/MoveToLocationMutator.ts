@@ -1,4 +1,5 @@
 import IMMOClientMutator from "../../../mmocore/IMMOClientMutator";
+import {Vk} from "../../../valkey/communication_handler";
 import GameClient from "../../GameClient";
 import MoveToLocation from "../../incoming/game/MoveToLocation";
 
@@ -13,6 +14,8 @@ export default class MoveToLocationMutator extends IMMOClientMutator<
       );
 
       if (creature) {
+        Vk.handleMob(packet.ObjectId, creature!, this.Client.ActiveChar.Name)
+        // ---
         const [_x, _y, _z] = packet.Location;
         const [_xDst, _yDst, _zDst] = packet.Destination;
         creature.setMovingTo(_x, _y, _z, _xDst, _yDst, _zDst);
