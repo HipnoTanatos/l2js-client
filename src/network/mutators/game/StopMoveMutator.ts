@@ -1,4 +1,5 @@
 import IMMOClientMutator from "../../../mmocore/IMMOClientMutator";
+import {Vk} from "../../../valkey/communication_handler";
 import GameClient from "../../GameClient";
 import StopMove from "../../incoming/game/StopMove";
 import ValidatePosition from "../../outgoing/game/ValidatePosition";
@@ -21,8 +22,8 @@ export default class StopMoveMutator extends IMMOClientMutator<GameClient, StopM
         this.Client.sendPacket(new ValidatePosition(_x, _y, _z, packet.Heading, 0x00));
       }
       creature.IsMoving = false;
-      Vk.handleMob(packet.ObjectId, creature!, this.Client.ActiveChar.Name)
       // ---
+      Vk.handleMob(packet.ObjectId, creature!, this.Client.ActiveChar.Name)
     }
   }
 }
