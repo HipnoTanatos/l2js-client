@@ -10,6 +10,7 @@ export class Vk {
   static  client: Valkey | null = null;
 
   static setClient (instance: Valkey) {
+
     Vk.client = instance;
   }
 
@@ -51,7 +52,7 @@ export class Vk {
       // unimplemented?
       is_spoiled: " ",
     }
-    Vk.publishEnvironment(id, hash, entityType, activeCharacter, true)
+    Vk.publishEnvironment(id, hash, entityType, activeCharacter)
   }
 
   static handleCharacter (objId: number, char: L2Character, activeCharacter: string) {
@@ -84,8 +85,8 @@ export class Vk {
       class_id: char.ClassId,
       class_name: char.ClassName,
     }
-    Vk.publishEnvironment(id, hash, 'character', activeCharacter, true)
-  }
+    Vk.publishEnvironment(id, hash, 'character', activeCharacter)
+    }
 
   static handleUser (objId: number, char: L2User, activeCharacter: string) {
     const id = objId
@@ -117,7 +118,7 @@ export class Vk {
       class_id: char.ClassId,
       class_name: char.ClassName,
     }
-    Vk.publishEnvironment(id, hash, 'active', activeCharacter, true)
+    Vk.publishEnvironment(id, hash, 'active', activeCharacter)
   }
 
   handlePartyMember (character: any) {
@@ -131,19 +132,24 @@ export class Vk {
   }
 
   static publishEnvironment (id: number, hash: {},
-                             type: string, character: string,
-                             add: boolean) {
+                             type: string, character: string) {
     const channel = 'environment'
-    const operation = add ? 'add' : 'rm'
+    const operation = 'add'
     const hId = `${character}:${type}:${id}:`
 
     Vk.client?.publish(channel, `${operation}:${hId}`)
     Vk.client?.hset(hId, hash)
   }
 
+  static async deleteObject (objectId: number, character: string) {
+    const channel = 'environment'
+    const operation = 'rm'
+    const [cursor, hId] = await Vk.client!.scan(0, 'MATCH', `*${character}:${objectId}`,
+                                                 'COUNT', 1000)
 
-
-
+    Vk.client?.publish(channel, `${operation}:${hId[0]}`)
+    Vk.client?.del(hId)
+  }
 }
 
 
