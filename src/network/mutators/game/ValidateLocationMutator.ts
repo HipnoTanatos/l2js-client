@@ -1,4 +1,5 @@
 import IMMOClientMutator from "../../../mmocore/IMMOClientMutator";
+import {Vk} from "../../../valkey/communication_handler";
 import GameClient from "../../GameClient";
 import ValidateLocation from "../../incoming/game/ValidateLocation";
 
@@ -8,6 +9,8 @@ export default class ValidateLocationMutator extends IMMOClientMutator<GameClien
     if (creature) {
       const [_x, _y, _z] = packet.Location;
       creature.Location = [_x, _y, _z, packet.Heading];
+      // ---
+      Vk.handleMob(packet.ObjectId, creature!, this.Client.ActiveChar.Name)
     }
   }
 }
