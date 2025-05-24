@@ -51,7 +51,7 @@ export class Vk {
       // unimplemented?
       is_spoiled: " ",
     }
-    Vk.publishEnvironment(id, hash, entityType, activeCharacter)
+    Vk.publishEnvironment(id, hash, entityType, activeCharacter, true)
   }
 
   static handleCharacter (objId: number, char: L2Character, activeCharacter: string) {
@@ -84,7 +84,7 @@ export class Vk {
       class_id: char.ClassId,
       class_name: char.ClassName,
     }
-    Vk.publishEnvironment(id, hash, 'character', activeCharacter)
+    Vk.publishEnvironment(id, hash, 'character', activeCharacter, true)
   }
 
   static handleUser (objId: number, char: L2User, activeCharacter: string) {
@@ -117,7 +117,7 @@ export class Vk {
       class_id: char.ClassId,
       class_name: char.ClassName,
     }
-    Vk.publishEnvironment(id, hash, 'active', activeCharacter)
+    Vk.publishEnvironment(id, hash, 'active', activeCharacter, true)
   }
 
   handlePartyMember (character: any) {
@@ -130,12 +130,20 @@ export class Vk {
     Vk.client?.expire(message.objectId.toString(), 30 * 60)
   }
 
-  static publishEnvironment (id: number, hash: {}, type: string, character: string) {
+  static publishEnvironment (id: number, hash: {},
+                             type: string, character: string,
+                             add: boolean) {
+    const channel = 'environment'
+    const operation = add ? 'add' : 'rm'
     const hId = `${character}:${type}:${id}:`
 
-    Vk.client?.publish('environment', `add:${hId}`)
+    Vk.client?.publish(channel, `${operation}:${hId}`)
     Vk.client?.hset(hId, hash)
   }
+
+
+
+
 }
 
 
