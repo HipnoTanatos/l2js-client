@@ -10,6 +10,7 @@ export default class ValidateLocationMutator extends IMMOClientMutator<GameClien
       const [_x, _y, _z] = packet.Location;
       creature.Location = [_x, _y, _z, packet.Heading];
       // ---
+      // TODO: position is one movement behind
       Vk.handleMob(packet.ObjectId, creature!, this.Client.ActiveChar.Name)
     }
   }
