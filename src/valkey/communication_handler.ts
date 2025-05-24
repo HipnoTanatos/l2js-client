@@ -135,7 +135,7 @@ export class Vk {
                              type: string, character: string) {
     const channel = 'environment'
     const operation = 'add'
-    const hId = `${character}:${type}:${id}:`
+    const hId = `${character}:${type}:${id}`
 
     Vk.client?.publish(channel, `${operation}:${hId}`)
     Vk.client?.hset(hId, hash)
@@ -144,8 +144,9 @@ export class Vk {
   static async deleteObject (objectId: number, character: string) {
     const channel = 'environment'
     const operation = 'rm'
-    const [cursor, hId] = await Vk.client!.scan(0, 'MATCH', `*${character}:${objectId}`,
-                                                   'COUNT', 1000)
+    const [cursor, hId_list] = await Vk.client!.scan(0, 'MATCH', `*${objectId}*`,
+                                                        'COUNT', 1000);
+    const hId = hId_list.filter(s => s.includes(character))
 
     Vk.client?.publish(channel, `${operation}:${hId[0]}`)
     Vk.client?.del(hId)
