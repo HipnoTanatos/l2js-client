@@ -92,7 +92,7 @@ export class Vk {
     const id = objId
     const hash = {
       // object attributes
-      id: char.Id,
+      id: 0,  // Users have no id?
       object_id: char.ObjectId,
       name: char.Name,
 
@@ -147,9 +147,12 @@ export class Vk {
     const [cursor, hId_list] = await Vk.client!.scan(0, 'MATCH', `*${objectId}*`,
                                                         'COUNT', 1000);
     const hId = hId_list.filter(s => s.includes(character))
+    console.log(`trying to delete: ${objectId}, ${hId}`)
 
-    Vk.client?.publish(channel, `${operation}:${hId[0]}`)
-    Vk.client?.del(hId)
+    if (hId?.length) {
+      Vk.client?.publish(channel, `${operation}:${hId[0]}`)
+      Vk.client?.del(hId)
+    }
   }
 }
 
@@ -217,6 +220,7 @@ const CommandHandlers: Record<string, CommandHandler> = {
   },
 
   hit: (client, params) => {
+    console.log(params)
     const [target, shift] = params.split(',')
     client.hit(parseInt(target, 10),
                   shift.toLowerCase() === 'true')
