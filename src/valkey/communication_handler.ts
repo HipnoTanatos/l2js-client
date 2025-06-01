@@ -59,7 +59,7 @@ export class Vk {
     const id = objId
     const hash = {
       // object attributes
-      id: char.Id,
+      id: 0, // characters had not id?
       object_id: char.ObjectId,
       name: char.Name,
 
@@ -125,6 +125,23 @@ export class Vk {
 
   }
 
+  static async handleMutation (objId: number, mutationType: string,
+                               mutation: {}, activeCharacter: string) {
+    const channel = 'environment'
+    const operation = 'mutate'
+    let hId: string = ''
+
+    for await (const key of scanIterator(`*${objId}*`)) {
+      if (key) {
+        hId = key
+        break
+      }
+    }
+
+    Vk.client?.publish(channel, `${operation}:${mutationType}:${hId}`)
+    Vk.client?.hset(hId, mutation)
+  }
+
   static handleChat (message: ChatMessage) {
     Vk.client?.publish('chat', message.objectId.toString())
     Vk.client?.hset(message.objectId.toString(), message)
@@ -147,13 +164,28 @@ export class Vk {
     const [cursor, hId_list] = await Vk.client!.scan(0, 'MATCH', `*${objectId}*`,
                                                         'COUNT', 1000);
     const hId = hId_list.filter(s => s.includes(character))
-    console.log(`trying to delete: ${objectId}, ${hId}`)
 
     if (hId?.length) {
       Vk.client?.publish(channel, `${operation}:${hId[0]}`)
       Vk.client?.del(hId)
     }
   }
+
+  static async mutateValue (hashId: string, value: number, message: string) {
+    Vk.client?.hset(hashId, {message: value})
+    Vk.client?.publish('mutation', `${message}:${hashId}`)
+  }
+}
+
+async function* scanIterator(pattern = '*') {
+  let cursor = '0';
+  do {
+    const [nextCursor, keys] = await Vk.client!.scan(cursor, 'MATCH', pattern, 'COUNT', 100);
+    cursor = nextCursor;
+    for (const key of keys) {
+      yield key;
+    }
+  } while (cursor !== '0');
 }
 
 
@@ -168,6 +200,7 @@ export class ValkeyClient {
     this.l2Clients = [l2Client]
 
     this.vkListerner.subscribe('commands')
+    this.vkPublisher.flushall()
     Vk.setClient(this.vkPublisher)
   }
 
@@ -220,7 +253,6 @@ const CommandHandlers: Record<string, CommandHandler> = {
   },
 
   hit: (client, params) => {
-    console.log(params)
     const [target, shift] = params.split(',')
     client.hit(parseInt(target, 10),
                   shift.toLowerCase() === 'true')

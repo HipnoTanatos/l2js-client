@@ -23,7 +23,9 @@ export default class StopMoveMutator extends IMMOClientMutator<GameClient, StopM
       }
       creature.IsMoving = false;
       // ---
-      Vk.handleMob(packet.ObjectId, creature!, this.Client.ActiveChar.Name)
+      Vk.handleMutation(packet.ObjectId, 'movement',
+                        {x: _x, y: _y, z: _z, is_moving: false},
+                        this.Client.ActiveChar.Name)
     }
   }
 }

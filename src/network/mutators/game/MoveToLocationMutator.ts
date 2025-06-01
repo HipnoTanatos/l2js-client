@@ -21,13 +21,8 @@ export default class MoveToLocationMutator extends IMMOClientMutator<
         if (creature.ObjectId !== this.Client.ActiveChar.ObjectId) {
           creature.calculateDistance(this.Client.ActiveChar);
         }
-      if (creature?.Name === "hipa") {
-        console.log("testing")
-        console.log(_x, _y, _z)
-        console.log(_xDst, _yDst, _zDst)
       }
-      }
-      Vk.handleMob(packet.ObjectId, creature!, this.Client.ActiveChar.Name)
+      // Vk.handleMob(packet.ObjectId, creature!, this.Client.ActiveChar.Name)
 
       // ---
     }
