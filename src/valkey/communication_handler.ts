@@ -127,7 +127,7 @@ export class Vk {
 
   static async handleMutation (objId: number, mutationType: string,
                                mutation: {}, activeCharacter: string) {
-    const channel = 'environment'
+    const channel = 'mutation'
     const operation = 'mutate'
     let hId: string = ''
 
